@@ -5,7 +5,7 @@ from django.http import FileResponse
 from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
+from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 
 from recipes.models import (
@@ -16,10 +16,10 @@ from users.models import User, Subscription
 from .serializers import (
     UserSerializer, UserCreateSerializer, AvatarSerializer,
     IngredientSerializer, RecipeReadSerializer, RecipeWriteSerializer,
-    ShortRecipeSerializer, SubscriptionSerializer, CartFavoriteSerializer
+    SubscriptionSerializer, CartFavoriteSerializer
 )
 from .permissions import (
-    IsAuthorOrReadOnly, RecipePermission,
+    RecipePermission,
     AdminOrReadOnly, OwnerOnly, CartFavoritePermission
 )
 from .filters import IngredientFilter, RecipeFilter

@@ -4,13 +4,11 @@ from drf_extra_fields.fields import Base64ImageField
 from rest_framework.exceptions import ValidationError
 import base64
 
-from users.models import User, Subscription
+from users.models import User
 from recipes.models import (
     Ingredient,
     RecipeIngredient,
-    Recipe,
-    Cart,
-    Favorite
+    Recipe
 )
 
 
