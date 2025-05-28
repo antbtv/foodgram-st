@@ -9,7 +9,7 @@ class AdminUser(UserAdmin):
                     'email',
                     'is_staff')
     
-    ordering = ('email')
+    ordering = ('email',)
 
     list_filter = ('is_staff',
                    'is_active')
@@ -19,7 +19,7 @@ class AdminUser(UserAdmin):
 
 
 class AdminSubscribe(admin.ModelAdmin):
-    list_display = ('id', 'user', 'author')
+    list_display = ('id', 'subscriber', 'author')
 
 
 admin.site.register(Subscription, AdminSubscribe)

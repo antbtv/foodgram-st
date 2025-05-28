@@ -19,10 +19,15 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.messages',
+    'django.contrib.messages',  
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
+    'django_filters',
+    'rest_framework.authtoken',
+    'djoser',
+    'users',
+    'recipes'
 ]
 
 MIDDLEWARE = [
@@ -36,7 +41,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'backend.urls'
+ROOT_URLCONF = 'foodgram.urls'
 
 TEMPLATES = [
     {
@@ -54,7 +59,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'backend.wsgi.application'
+WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 
 # Database
@@ -62,14 +67,12 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        # Меняем настройку Django: теперь для работы будет использоваться
-        # бэкенд postgresql
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'django'),
-        'USER': os.getenv('POSTGRES_USER', 'django'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', ''),
-        'PORT': os.getenv('DB_PORT', 5432)
+        'ENGINE':  'django.db.backends.postgresql',
+        'NAME':     os.getenv('POSTGRES_DB'),
+        'USER':     os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST':     os.getenv('DB_HOST', 'db'),
+        'PORT':     os.getenv('DB_PORT', 5432),
     }
 }
 
@@ -92,6 +95,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'users.User'
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -107,17 +111,33 @@ USE_L10N = True
 USE_TZ = True
 
 
-# При планировании архитектуры было решено,
-# что статические файлы Django должны быть доступны по адресу /static/
 STATIC_URL = '/static/'
-# Указываем корневую директорию для сборки статических файлов;
-# в контейнере это будет /app/collected_static
-STATIC_ROOT = BASE_DIR / 'collected_static'
-# Теперь при вызове команды python manage.py collectstatic
-# Django будет копировать все статические файлы в директорию collected_static
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000'
-]
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+    ],
+}
+
+DJOSER = {
+    "LOGIN_FIELD": "email",
+    "SERIALIZERS": {
+        "user": "api.serializers.UserSerializer",
+        "current_user": "api.serializers.UserSerializer",
+        "user_create": "api.serializers.UserCreateSerializer",
+        "user_set_password": "api.serializers.AvatarSerializer",
+    },
+    "PERMISSIONS": {
+        "user": ["rest_framework.permissions.IsAuthenticated"],
+        "user_list": ["rest_framework.permissions.AllowAny"],
+        "current_user": ["rest_framework.permissions.IsAuthenticated"],
+    },
+}
+
