@@ -41,6 +41,12 @@ jobs:
 
 
     - name: Lint with ruff and run django tests
+      env:
+        POSTGRES_DB: foodgram
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+        DB_HOST: db
+        DB_PORT: 5432
       run: |
         python -m ruff check backend/
         cd backend/
