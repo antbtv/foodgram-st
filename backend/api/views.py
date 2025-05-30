@@ -20,7 +20,7 @@ from .serializers import (
 )
 from .permissions import (
     RecipePermission,
-    AdminOrReadOnly, OwnerOnly, CartFavoritePermission
+    AdminOrReadOnly, CartFavoritePermission
 )
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import Paginator

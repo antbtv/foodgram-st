@@ -1,8 +1,6 @@
 from rest_framework import serializers
-from django.core.files.base import ContentFile
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework.exceptions import ValidationError
-import base64
 
 from users.models import User
 from recipes.models import (
