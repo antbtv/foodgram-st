@@ -1,10 +1,20 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
 
 
 class User(AbstractUser):
-    username = models.CharField('Логин', max_length=100, unique=True)
-    first_name = models.CharField('Имя', max_length=100, unique=True)
+    username_validator = RegexValidator(
+        regex=r'^[\w.@+-]+\Z',
+        message='Введите корректный логин. Разрешены только буквы, цифры и символы @/./+/-/_'
+    )
+    username = models.CharField(
+        'Логин',
+        max_length=100,
+        unique=True,
+        validators=[username_validator]
+    )
+    first_name = models.CharField('Имя', max_length=100)
     last_name = models.CharField('Фамилия', max_length=100)
     avatar = models.ImageField('Аватар', upload_to='avatars/', blank=True, null=True)
     email = models.EmailField('Email', max_length=100, unique=True)

@@ -86,6 +86,8 @@ docker-compose up -d --build
 
 ```bash
 # Для Linux используйте sudo 
+docker-compose exec backend python manage.py makemigrations users
+docker-compose exec backend python manage.py makemigrations recipes
 docker-compose exec backend python manage.py migrate
 ```
 
@@ -93,7 +95,8 @@ docker-compose exec backend python manage.py migrate
 
 ```bash
 # Для Linux используйте sudo 
-docker-compose exec backend python load_test_ingredients
+docker-compose exec backend python manage.py shell
+exec(open("test_media/load_test_ingredients.py").read())
 ```
 
 5. Создать суперпользователя:

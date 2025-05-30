@@ -44,25 +44,18 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
 
 class AvatarSerializer(serializers.ModelSerializer):
-    avatar = serializers.CharField(write_only=True)
+    avatar = Base64ImageField(required=True)
 
     class Meta:
         model = User
         fields = ('avatar',)
 
-    def validate_avatar(self, value):
-        try:
-            format, img_str = value.split(';base64,')
-            ext = format.split('/')[-1]
-            return ContentFile(
-                base64.b64decode(img_str),
-                name=f'avatar.{ext}'
-            )
-        except Exception:
-            raise ValidationError('Некорректный формат изображения')
-
     def update(self, instance, validated_data):
-        instance.avatar = validated_data['avatar']
+        avatar = validated_data.get("avatar")
+        if avatar is None:
+            raise serializers.ValidationError({"avatar": "Avatar field is required."})
+
+        instance.avatar = avatar
         instance.save()
         return instance
 
@@ -105,11 +98,11 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         user = self.context['request'].user
-        return user.is_authenticated and obj.favorites.filter(user=user).exists()
+        return user.is_authenticated and obj.favorite.filter(user=user).exists()
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context['request'].user
-        return user.is_authenticated and obj.carts.filter(user=user).exists()
+        return user.is_authenticated and obj.cart.filter(user=user).exists()
 
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
@@ -121,7 +114,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ('name', 'image', 'text', 'cooking_time', 'ingredients')
+        fields = ('id', 'name', 'image', 'text', 'cooking_time', 'ingredients')
 
     def validate_ingredients(self, value):
         if not value:
@@ -149,10 +142,13 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        ingredients = validated_data.pop('recipe_ingredients')
-        instance.recipe_ingredients.all().delete()
-        self.create_ingredients(instance, ingredients)
+        ingredients = validated_data.pop('recipe_ingredients', None)
+        if ingredients is not None:
+            instance.recipe_ingredients.all().delete()
+            self.create_ingredients(instance, ingredients)
         return super().update(instance, validated_data)
+
+
 
 
 class ShortRecipeSerializer(serializers.ModelSerializer):

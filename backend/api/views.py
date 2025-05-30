@@ -99,7 +99,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     pagination_class = Paginator
-    http_method_names = ['get', 'post', 'delete', 'put', 'patch']
+    http_method_names = ['get', 'post', 'delete', 'put', 'patch', 'head', 'options']
 
     def get_permissions(self):
         if self.action in ['create']:
@@ -131,7 +131,13 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = UserSerializer(request.user, context={'request': request})
         return Response(serializer.data)
 
-    @action(detail=False, methods=['post', 'delete'], url_path='me/avatar', permission_classes=[OwnerOnly])
+    @action(
+        detail=False,
+        methods=['put', 'delete'],
+        url_path='me/avatar',
+        permission_classes=[IsAuthenticated],
+        serializer_class=AvatarSerializer
+    )
     def avatar(self, request):
         user = request.user
         if request.method == 'DELETE':
@@ -139,10 +145,20 @@ class UserViewSet(viewsets.ModelViewSet):
             user.avatar = None
             user.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        serializer = AvatarSerializer(user, data=request.data, context={'request': request})
+        
+        serializer = self.get_serializer(
+            user,
+            data=request.data,
+            partial=True,               
+            context={'request': request}
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({'avatar': user.avatar.url}, status=status.HTTP_200_OK)
+
+        return Response(
+            {'avatar': request.build_absolute_uri(user.avatar.url)},
+            status=status.HTTP_200_OK
+        )
 
     @action(detail=False, methods=['post'], url_path='set_password', permission_classes=[IsAuthenticated])
     def set_password(self, request):
