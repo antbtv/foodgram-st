@@ -11,6 +11,8 @@ services:
     env_file: .env
     volumes:
       - pg_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
   backend:
     container_name: foodgram-back
     build: 
@@ -20,6 +22,7 @@ services:
     volumes:
       - static:/app/static/ 
       - media:/app/media/
+      - ../postman_collection:/app/postman_collection
     depends_on:
       - db
     ports:

@@ -86,8 +86,6 @@ docker-compose up -d --build
 
 ```bash
 # Для Linux используйте sudo 
-docker-compose exec backend python manage.py makemigrations users
-docker-compose exec backend python manage.py makemigrations recipes
 docker-compose exec backend python manage.py migrate
 ```
 
@@ -95,7 +93,8 @@ docker-compose exec backend python manage.py migrate
 
 ```bash
 # Для Linux используйте sudo 
-docker-compose exec backend python manage.py shell
+docker-compose exec backend python manage.py shell 
+
 exec(open("test_media/load_test_ingredients.py").read())
 ```
 
@@ -118,11 +117,16 @@ OpenAPI-схема: `docs/openapi-schema.yml`
 Также в проекте есть Postman-коллекция:
 `postman_collection/foodgram.postman_collection.json`
 
+
+Для очистки базы данных следует применить следующую команду:
+```bash
+docker-compose exec backend bash -c "chmod +x /app/postman_collection/clear_db.sh && /app/postman_collection/clear_db.sh"
+```
 ---
 
 ## 👨‍💻 Автор
 
-* 🧑‍💻 **ant_btv** — Backend разработчик
+* 🧑‍💻 **ant_btv** — Backend-разработчик
 
 ---
 

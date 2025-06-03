@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+
 from .models import (User, Subscription)
 
 
@@ -8,12 +9,12 @@ class AdminUser(UserAdmin):
                     'first_name',
                     'email',
                     'is_staff')
-    
+
     ordering = ('email',)
 
     list_filter = ('is_staff',
                    'is_active')
-    
+
     search_fields = ('username',
                      'email')
 

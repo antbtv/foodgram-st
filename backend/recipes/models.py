@@ -2,6 +2,13 @@ from django.db import models
 from users.models import User
 from django.core.validators import MinValueValidator
 
+from .constants import (
+    MIN_COOKING_TIME,
+    MAX_RECIPE_NAME_LENGTH,
+    MAX_INGREDIENT_NAME_LENGTH,
+    MAX_MEASUREMENT_UNIT_LENGTH
+)
+
 
 class Recipe(models.Model):
     author = models.ForeignKey(
@@ -10,7 +17,10 @@ class Recipe(models.Model):
         related_name='recipes',
         verbose_name='Автор'
     )
-    name = models.CharField('Название', max_length=100)
+    name = models.CharField(
+        'Название',
+        max_length=MAX_RECIPE_NAME_LENGTH
+    )
     text = models.TextField('Описание приготовления')
     ingredients = models.ManyToManyField(
         'Ingredient',
@@ -20,7 +30,7 @@ class Recipe(models.Model):
     )
     cooking_time = models.PositiveIntegerField(
         'Время приготовления',
-        validators=[MinValueValidator(1)]
+        validators=[MinValueValidator(MIN_COOKING_TIME)]
     )
     image = models.ImageField('Изображение', upload_to='recipes/')
 
@@ -34,8 +44,15 @@ class Recipe(models.Model):
 
 
 class Ingredient(models.Model):
-    name = models.CharField('Название', max_length=100)
-    measurement_unit = models.CharField('Единица измерения', max_length=100)
+    name = models.CharField(
+        'Название',
+        max_length=MAX_INGREDIENT_NAME_LENGTH
+    )
+
+    measurement_unit = models.CharField(
+        'Единица измерения',
+        max_length=MAX_MEASUREMENT_UNIT_LENGTH
+    )
 
     class Meta:
         ordering = ('name',)
@@ -67,13 +84,13 @@ class RecipeIngredient(models.Model):
     )
     amount = models.PositiveIntegerField(
         "количество",
-        validators=[MinValueValidator(1)],
+        validators=[MinValueValidator(MIN_COOKING_TIME)],
     )
 
     class Meta:
         ordering = ("recipe", "ingredient")
-        verbose_name = "ингредиент"
-        verbose_name_plural = "ингредиенты"
+        verbose_name = "ингредиент рецепта"
+        verbose_name_plural = "ингредиенты рецепта"
 
     def __str__(self):
         return (
