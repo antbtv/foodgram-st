@@ -51,41 +51,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    def create(self, request, *args, **kwargs):
-        write_serializer = self.get_serializer(data=request.data)
-        write_serializer.is_valid(raise_exception=True)
-        recipe = write_serializer.save(author=request.user)
-        read_serializer = RecipeReadSerializer(
-            recipe, context={'request': request}
-        )
-        return Response(read_serializer.data, status=status.HTTP_201_CREATED)
-
-    def update(self, request, *args, **kwargs):
-        if 'ingredients' not in request.data:
-            return Response(
-                {'ingredients': 'Это поле обязательно для обновления рецепта'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        write_serializer = self.get_serializer(
-            instance, data=request.data, partial=partial
-        )
-        write_serializer.is_valid(raise_exception=True)
-        recipe = write_serializer.save()
-        read_serializer = RecipeReadSerializer(
-            recipe, context={'request': request}
-        )
-        return Response(read_serializer.data, status=status.HTTP_200_OK)
-
-    def partial_update(self, request, *args, **kwargs):
-        if 'ingredients' not in request.data:
-            return Response(
-                {'ingredients': 'Это поле обязательно для обновления рецепта'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        return self.update(request, *args, **kwargs)
-
     @action(detail=True, methods=['get'], url_path='get-link')
     def get_link(self, request, pk=None):
         recipe = self.get_object()

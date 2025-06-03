@@ -157,6 +157,13 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             'cooking_time', 'ingredients'
         )
 
+    def validate(self, attrs):
+        if 'ingredients' not in attrs or not attrs['ingredients']:
+            raise serializers.ValidationError({
+                'ingredients': 'Это поле обязательно и не может быть пустым.'
+            })
+        return super().validate(attrs)
+
     def validate_image(self, value):
         if value == "" or value is None:
             raise serializers.ValidationError(
@@ -195,6 +202,12 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         instance.recipe_ingredients.all().delete()
         self.create_ingredients(instance, ingredients)
         return super().update(instance, validated_data)
+
+    def to_representation(self, instance):
+        return RecipeReadSerializer(
+            instance,
+            context=self.context
+        ).data
 
 
 class ShortRecipeSerializer(serializers.ModelSerializer):

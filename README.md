@@ -120,6 +120,7 @@ OpenAPI-схема: `docs/openapi-schema.yml`
 
 Для очистки базы данных следует применить следующую команду:
 ```bash
+# Для Linux используйте sudo 
 docker-compose exec backend bash -c "chmod +x /app/postman_collection/clear_db.sh && /app/postman_collection/clear_db.sh"
 ```
 ---
