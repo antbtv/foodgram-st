@@ -1,6 +1,6 @@
 import os
 
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.http import FileResponse
 from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
@@ -20,9 +20,8 @@ from .serializers import (
     RecipeWriteSerializer, SubscriptionSerializer
 )
 from .permissions import (
-    RecipePermission,
-    AdminOrReadOnly,
-    CartFavoritePermission
+    IsAuthorOrReadOnly,
+    AdminOrReadOnly
 )
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import Paginator
@@ -41,7 +40,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = Paginator
     filter_backends = [DjangoFilterBackend]
     filterset_class = RecipeFilter
-    permission_classes = [RecipePermission]
+    permission_classes = [IsAuthorOrReadOnly]
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
@@ -83,7 +82,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=['post', 'delete'],
-        permission_classes=[CartFavoritePermission]
+        permission_classes=[IsAuthenticated]
     )
     def favorite(self, request, pk=None):
         return self._toggle(
@@ -94,7 +93,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=['post', 'delete'],
-        permission_classes=[CartFavoritePermission]
+        permission_classes=[IsAuthenticated]
     )
     def shopping_cart(self, request, pk=None):
         return self._toggle(
@@ -291,3 +290,8 @@ class UserViewSet(viewsets.ModelViewSet):
             author=author
         ).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+def redirect_to_recipe(request, pk):
+    get_object_or_404(Recipe, pk=pk)
+    return redirect(f'/api/recipes/{pk}/')

@@ -2,7 +2,7 @@ from rest_framework import permissions
 from rest_framework.permissions import SAFE_METHODS
 
 
-class RecipePermission(permissions.BasePermission):
+class IsAuthorOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method in SAFE_METHODS:
             return True
@@ -20,11 +20,3 @@ class AdminOrReadOnly(permissions.BasePermission):
             request.method in SAFE_METHODS
             or (request.user.is_authenticated and request.user.is_staff)
         )
-
-
-class CartFavoritePermission(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return request.user.is_authenticated
-
-    def has_object_permission(self, request, view, obj):
-        return obj.user == request.user

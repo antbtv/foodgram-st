@@ -59,7 +59,7 @@ class AvatarSerializer(serializers.ModelSerializer):
     def validate_avatar(self, value):
         if not value:
             raise serializers.ValidationError(
-                {"Поле аватара обязательно."}
+                "Поле аватара обязательно."
             )
         return value
 
@@ -157,28 +157,28 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             'cooking_time', 'ingredients'
         )
 
-    def validate(self, attrs):
-        if 'ingredients' not in attrs or not attrs['ingredients']:
-            raise serializers.ValidationError({
-                'ingredients': 'Это поле обязательно и не может быть пустым.'
-            })
-        return super().validate(attrs)
+    def validate(self, value):
+        ingredients = self.initial_data.get('ingredients')
+        if not ingredients:
+            raise ValidationError('Добавьте хотя бы один ингредиент')
+
+        ingredient_ids = [ingredient['id'] for ingredient in ingredients]
+        if len(ingredient_ids) != len(set(ingredient_ids)):
+            raise ValidationError('Ингредиенты не должны повторяться')
+
+        for ingredient in ingredients:
+            if ingredient.get('amount') <= 0:
+                raise serializers.ValidationError(
+                    'Количество должно быть больше нуля'
+                )
+
+        return value
 
     def validate_image(self, value):
         if value == "" or value is None:
             raise serializers.ValidationError(
                 "Поле 'image' не может быть пустым."
             )
-        return value
-
-    def validate_ingredients(self, value):
-        if not value:
-            raise ValidationError('Добавьте хотя бы один ингредиент')
-
-        ingredients = [item['id'] for item in value]
-        if len(ingredients) != len(set(ingredients)):
-            raise ValidationError('Ингредиенты не должны повторяться')
-
         return value
 
     def create_ingredients(self, recipe, ingredients):
@@ -192,7 +192,6 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
-        print(ingredients)
         recipe = Recipe.objects.create(**validated_data)
         self.create_ingredients(recipe, ingredients)
         return recipe

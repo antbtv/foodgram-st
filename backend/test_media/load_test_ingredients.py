@@ -1,5 +1,7 @@
 import json
+
 from django.db import transaction
+
 from recipes.models import Ingredient
 
 
@@ -23,3 +25,6 @@ def load_ingredients():
                 if (item['name'], item['measurement_unit']) not in existing
             ]
             Ingredient.objects.bulk_create(new_ingredients)
+
+
+load_ingredients()
